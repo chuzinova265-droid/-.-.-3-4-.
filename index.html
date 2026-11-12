@@ -1,0 +1,828 @@
+<html lang="ru"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чайная викторина для детей</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffeb3b 0%, #ff9800 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #5d4037;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #4caf50;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+            border: 5px dashed #ffeb3b;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .teams-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .team {
+            flex: 1;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .team-1 {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .team-2 {
+            background: #e91e63;
+            color: white;
+        }
+        
+        .team.active {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border: 3px solid #ffeb3b;
+        }
+        
+        .team-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .team-name-input {
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px dashed white;
+            border-radius: 8px;
+            padding: 5px 10px;
+            color: white;
+            font-size: 1.3rem;
+            text-align: center;
+            width: 80%;
+            font-weight: bold;
+        }
+        
+        .team-name-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .team-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .category {
+            background: #ff5722;
+            color: white;
+            padding: 15px 5px;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+        }
+        
+        .question-cell {
+            background: #8bc34a;
+            color: white;
+            aspect-ratio: 1.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+            border: 3px solid transparent;
+        }
+        
+        .question-cell:hover {
+            transform: scale(1.05);
+            border: 3px solid #ffeb3b;
+        }
+        
+        .question-cell.used {
+            background: #bdbdbd;
+            color: #757575;
+            cursor: not-allowed;
+            transform: none;
+            border: 3px dashed #757575;
+        }
+        
+        .question-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .question-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 5px solid #ff9800;
+        }
+        
+        .question-value {
+            font-size: 1.5rem;
+            color: #5d4037;
+            margin-bottom: 10px;
+            font-weight: bold;
+            background: #ffeb3b;
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .current-team {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .team-1-turn {
+            background: #bbdefb;
+            color: #0d47a1;
+        }
+        
+        .team-2-turn {
+            background: #f8bbd0;
+            color: #880e4f;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 3px solid #ff9800;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .submit-btn {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background: #388e3c;
+            transform: scale(1.05);
+        }
+        
+        .back-btn {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .back-btn:hover {
+            background: #f57c00;
+            transform: scale(1.05);
+        }
+        
+        .reset-btn {
+            background: #f44336;
+            color: white;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .reset-btn:hover {
+            background: #d32f2f;
+            transform: scale(1.05);
+        }
+        
+        .result-message {
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-height: 30px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .correct {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .incorrect {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+        
+        .winner-message {
+            text-align: center;
+            font-size: 2rem;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .team-1-winner {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .team-2-winner {
+            background: #e91e63;
+            color: white;
+        }
+        
+        .draw {
+            background: #ff9800;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .category {
+                font-size: 1rem;
+                padding: 10px 3px;
+                min-height: 60px;
+            }
+            
+            .question-cell {
+                font-size: 1.5rem;
+            }
+            
+            .teams-container {
+                flex-direction: column;
+            }
+            
+            .team-name-input {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            .question-text {
+                font-size: 1.3rem;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
+            
+            .category {
+                font-size: 0.9rem;
+                min-height: 50px;
+            }
+        }
+        
+        .icon {
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍵 Чайная Викторина 🍵</h1>
+            <p class="subtitle">Игра для двух команд! Проверьте свои знания о чае!</p>
+        </header>
+        
+        <div class="teams-container">
+            <div class="team team-1 active" id="team1">
+                <div class="team-name">
+                    <span class="icon">🔵</span>
+                    <input type="text" class="team-name-input" id="team1Name" placeholder="Команда 1" maxlength="15">
+                    <span class="icon">🔵</span>
+                </div>
+                <div class="team-score" id="team1Score">0</div>
+            </div>
+            
+            <div class="team team-2" id="team2">
+                <div class="team-name">
+                    <span class="icon">🔴</span>
+                    <input type="text" class="team-name-input" id="team2Name" placeholder="Команда 2" maxlength="15">
+                    <span class="icon">🔴</span>
+                </div>
+                <div class="team-score" id="team2Score">0</div>
+            </div>
+        </div>
+        
+        <div class="winner-message" id="winnerMessage"></div>
+        
+        <div class="game-board" id="gameBoard"><div class="category">🍵 Виды чая</div><div class="category">🌍 Страны</div><div class="category">🎉 Традиции</div><div class="category">🫖 Заваривание</div><div class="category">😊 Польза чая</div><div class="question-cell" data-category="0" data-question="0">100</div><div class="question-cell" data-category="0" data-question="1">200</div><div class="question-cell" data-category="0" data-question="2">300</div><div class="question-cell" data-category="0" data-question="3">400</div><div class="question-cell" data-category="0" data-question="4">500</div><div class="question-cell" data-category="1" data-question="0">100</div><div class="question-cell" data-category="1" data-question="1">200</div><div class="question-cell" data-category="1" data-question="2">300</div><div class="question-cell" data-category="1" data-question="3">400</div><div class="question-cell" data-category="1" data-question="4">500</div><div class="question-cell" data-category="2" data-question="0">100</div><div class="question-cell" data-category="2" data-question="1">200</div><div class="question-cell" data-category="2" data-question="2">300</div><div class="question-cell" data-category="2" data-question="3">400</div><div class="question-cell" data-category="2" data-question="4">500</div><div class="question-cell" data-category="3" data-question="0">100</div><div class="question-cell" data-category="3" data-question="1">200</div><div class="question-cell" data-category="3" data-question="2">300</div><div class="question-cell" data-category="3" data-question="3">400</div><div class="question-cell" data-category="3" data-question="4">500</div><div class="question-cell" data-category="4" data-question="0">100</div><div class="question-cell" data-category="4" data-question="1">200</div><div class="question-cell" data-category="4" data-question="2">300</div><div class="question-cell" data-category="4" data-question="3">400</div><div class="question-cell" data-category="4" data-question="4">500</div></div>
+        
+        <div class="controls">
+            <button class="reset-btn" id="resetBtn">
+                <span class="icon">🔄</span>
+                Новая игра
+            </button>
+        </div>
+    </div>
+    
+    <div class="question-screen" id="questionScreen">
+        <div class="question-content">
+            <div class="question-value" id="questionValue">Вопрос за 100 очков</div>
+            <div class="current-team" id="currentTeamDisplay">Сейчас отвечает: Команда 1</div>
+            <div class="question-text" id="questionText">Текст вопроса появится здесь</div>
+            <input type="text" class="answer-input" id="answerInput" placeholder="Введите ответ команды...">
+            <div class="buttons">
+                <button class="submit-btn" id="submitBtn">
+                    <span class="icon">✅</span>
+                    Проверить ответ
+                </button>
+                <button class="back-btn" id="backBtn">
+                    <span class="icon">↩️</span>
+                    Вернуться
+                </button>
+            </div>
+            <div class="result-message" id="resultMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // Данные для игры (упрощенные вопросы для детей)
+        const gameData = {
+            categories: [
+                "🍵 Виды чая",
+                "🌍 Страны", 
+                "🎉 Традиции",
+                "🫖 Заваривание",
+                "😊 Польза чая"
+            ],
+            questions: [
+                // Виды чая
+                [
+                    { value: 100, question: "Какой чай имеет зеленый цвет?", answer: "Зеленый" },
+                    { value: 200, question: "Какой чай пьют с молоком в Англии?", answer: "Черный" },
+                    { value: 300, question: "Как называется чай с запахом жасмина?", answer: "Жасминовый" },
+                    { value: 400, question: "Какой чай делают из цветков?", answer: "Цветочный или травяной" },
+                    { value: 500, question: "Какой чай самый крепкий?", answer: "Черный" }
+                ],
+                // Страны
+                [
+                    { value: 100, question: "В какой стране придумали чай?", answer: "Китай" },
+                    { value: 200, question: "В какой стране пьют чай в 5 часов?", answer: "Англия" },
+                    { value: 300, question: "В какой стране чай пьют из пиал?", answer: "Япония" },
+                    { value: 400, question: "В какой стране чай пьют с сахаром и мятой?", answer: "Марокко" },
+                    { value: 500, question: "Какая страна больше всех производит чая?", answer: "Китай" }
+                ],
+                // Традиции
+                [
+                    { value: 100, question: "Что едят с чаем в России?", answer: "Пряники, печенье, варенье" },
+                    { value: 200, question: "Как называется специальный чайник в России?", answer: "Самовар" },
+                    { value: 300, question: "Что кладут в чай для сладости?", answer: "Сахар, мед" },
+                    { value: 400, question: "Как называется японская чайная церемония?", answer: "Тяною" },
+                    { value: 500, question: "Что добавляют в чай в Англии?", answer: "Молоко" }
+                ],
+                // Заваривание
+                [
+                    { value: 100, question: "В чем заваривают чай?", answer: "В чайнике" },
+                    { value: 200, question: "Какой водой нужно заливать чай?", answer: "Кипятком" },
+                    { value: 300, question: "Сколько минут нужно заваривать чай?", answer: "3-5 минут" },
+                    { value: 400, question: "Что нужно сделать с чаем перед завариванием?", answer: "Прогреть чайник" },
+                    { value: 500, question: "Как называется специальная коробочка для хранения чая?", answer: "Чайница" }
+                ],
+                // Польза чая
+                [
+                    { value: 100, question: "Что делает чай, когда мы устали?", answer: "Бодрит" },
+                    { value: 200, question: "Что в чае помогает не болеть?", answer: "Витамины" },
+                    { value: 300, question: "Какой чай пьют при простуде?", answer: "С лимоном, с малиной" },
+                    { value: 400, question: "Что в чае полезно для сердца?", answer: "Антиоксиданты" },
+                    { value: 500, question: "Какой чай успокаивает?", answer: "Травяной" }
+                ]
+            ]
+        };
+
+        // Начальное состояние игры
+        const initialGameState = {
+            team1Score: 0,
+            team2Score: 0,
+            team1Name: "Команда 1",
+            team2Name: "Команда 2",
+            currentTeam: 1,
+            usedQuestions: [],
+            currentQuestion: null,
+            gameFinished: false,
+            gameStarted: false // Добавляем флаг начала игры
+        };
+
+        // Состояние игры
+        let gameState = {...initialGameState};
+
+        // Элементы DOM
+        const gameBoard = document.getElementById('gameBoard');
+        const questionScreen = document.getElementById('questionScreen');
+        const questionValue = document.getElementById('questionValue');
+        const questionText = document.getElementById('questionText');
+        const currentTeamDisplay = document.getElementById('currentTeamDisplay');
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const backBtn = document.getElementById('backBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultMessage = document.getElementById('resultMessage');
+        const team1Score = document.getElementById('team1Score');
+        const team2Score = document.getElementById('team2Score');
+        const team1NameInput = document.getElementById('team1Name');
+        const team2NameInput = document.getElementById('team2Name');
+        const team1Element = document.getElementById('team1');
+        const team2Element = document.getElementById('team2');
+        const winnerMessage = document.getElementById('winnerMessage');
+
+        // Инициализация игры
+        function initGame() {
+            loadGameState();
+            
+            // Проверяем, была ли игра начата ранее
+            if (!gameState.gameStarted) {
+                // Если игра не начиналась, сбрасываем счет
+                resetScores();
+            }
+            
+            renderGameBoard();
+            updateScoreDisplay();
+            updateActiveTeam();
+            
+            // Обработчики событий
+            submitBtn.addEventListener('click', checkAnswer);
+            backBtn.addEventListener('click', closeQuestion);
+            resetBtn.addEventListener('click', resetGame);
+            
+            // Обработчики для ввода названий команд
+            team1NameInput.addEventListener('input', updateTeamNames);
+            team2NameInput.addEventListener('input', updateTeamNames);
+        }
+
+        // Сброс счетов
+        function resetScores() {
+            gameState.team1Score = 0;
+            gameState.team2Score = 0;
+            gameState.usedQuestions = [];
+            gameState.currentTeam = 1;
+            gameState.gameFinished = false;
+            updateScoreDisplay();
+            updateActiveTeam();
+        }
+
+        // Обновление названий команд
+        function updateTeamNames() {
+            gameState.team1Name = team1NameInput.value || "Команда 1";
+            gameState.team2Name = team2NameInput.value || "Команда 2";
+            updateCurrentTeamDisplay();
+            saveGameState();
+        }
+
+        // Рендеринг игрового поля
+        function renderGameBoard() {
+            gameBoard.innerHTML = '';
+            
+            // Добавляем категории
+            gameData.categories.forEach(category => {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'category';
+                categoryElement.textContent = category;
+                gameBoard.appendChild(categoryElement);
+            });
+            
+            // Добавляем вопросы
+            gameData.questions.forEach((categoryQuestions, categoryIndex) => {
+                categoryQuestions.forEach((question, questionIndex) => {
+                    const questionElement = document.createElement('div');
+                    questionElement.className = 'question-cell';
+                    questionElement.textContent = question.value;
+                    questionElement.dataset.category = categoryIndex;
+                    questionElement.dataset.question = questionIndex;
+                    
+                    // Проверяем, использован ли вопрос
+                    if (gameState.usedQuestions.includes(`${categoryIndex}-${questionIndex}`)) {
+                        questionElement.classList.add('used');
+                    } else {
+                        // Добавляем обработчик события
+                        questionElement.addEventListener('click', handleQuestionClick);
+                    }
+                    
+                    gameBoard.appendChild(questionElement);
+                });
+            });
+            
+            // Проверяем, закончена ли игра
+            checkGameFinished();
+        }
+
+        // Обработчик клика по вопросу
+        function handleQuestionClick(event) {
+            const categoryIndex = parseInt(event.target.dataset.category);
+            const questionIndex = parseInt(event.target.dataset.question);
+            
+            // Проверяем, не использован ли уже вопрос
+            if (gameState.usedQuestions.includes(`${categoryIndex}-${questionIndex}`)) {
+                return;
+            }
+            
+            // Отмечаем, что игра началась
+            if (!gameState.gameStarted) {
+                gameState.gameStarted = true;
+                saveGameState();
+            }
+            
+            openQuestion(categoryIndex, questionIndex, event.target);
+        }
+
+        // Открытие вопроса
+        function openQuestion(categoryIndex, questionIndex, element) {
+            gameState.currentQuestion = {
+                categoryIndex,
+                questionIndex,
+                element: element
+            };
+            
+            const question = gameData.questions[categoryIndex][questionIndex];
+            
+            questionValue.textContent = `🍵 Вопрос за ${question.value} очков 🍵`;
+            questionText.textContent = question.question;
+            answerInput.value = '';
+            resultMessage.textContent = '';
+            
+            // Обновляем отображение текущей команды
+            updateCurrentTeamDisplay();
+            
+            questionScreen.style.display = 'flex';
+            answerInput.focus();
+        }
+
+        // Закрытие вопроса
+        function closeQuestion() {
+            questionScreen.style.display = 'none';
+            gameState.currentQuestion = null;
+        }
+
+        // Обновление отображения текущей команды
+        function updateCurrentTeamDisplay() {
+            const teamName = gameState.currentTeam === 1 ? `${gameState.team1Name} 🔵` : `${gameState.team2Name} 🔴`;
+            currentTeamDisplay.textContent = `Сейчас отвечает: ${teamName}`;
+            currentTeamDisplay.className = `current-team ${gameState.currentTeam === 1 ? 'team-1-turn' : 'team-2-turn'}`;
+        }
+
+        // Проверка ответа
+        function checkAnswer() {
+            if (gameState.gameFinished) return;
+            
+            const current = gameState.currentQuestion;
+            if (!current) return;
+            
+            const question = gameData.questions[current.categoryIndex][current.questionIndex];
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = question.answer.toLowerCase();
+            
+            if (userAnswer === '') {
+                resultMessage.textContent = '😟 Пожалуйста, введите ответ команды';
+                resultMessage.className = 'result-message incorrect';
+                return;
+            }
+            
+            // Более мягкая проверка ответа для детей
+            const isCorrect = userAnswer === correctAnswer || 
+                             correctAnswer.includes(userAnswer) || 
+                             userAnswer.includes(correctAnswer);
+            
+            if (isCorrect) {
+                // Правильный ответ
+                if (gameState.currentTeam === 1) {
+                    gameState.team1Score += question.value;
+                } else {
+                    gameState.team2Score += question.value;
+                }
+                
+                resultMessage.textContent = `🎉 Правильно! +${question.value} очков`;
+                resultMessage.className = 'result-message correct';
+            } else {
+                // Неправильный ответ
+                resultMessage.textContent = `😔 Почти! Правильный ответ: ${question.answer}`;
+                resultMessage.className = 'result-message incorrect';
+            }
+            
+            // Помечаем вопрос как использованный
+            const questionId = `${current.categoryIndex}-${current.questionIndex}`;
+            if (!gameState.usedQuestions.includes(questionId)) {
+                gameState.usedQuestions.push(questionId);
+                
+                // Обновляем внешний вид ячейки вопроса
+                if (current.element) {
+                    current.element.classList.add('used');
+                    current.element.removeEventListener('click', handleQuestionClick);
+                }
+            }
+            
+            // Переключаем команду
+            gameState.currentTeam = gameState.currentTeam === 1 ? 2 : 1;
+            
+            // Обновляем отображение
+            updateScoreDisplay();
+            updateActiveTeam();
+            saveGameState();
+            
+            // Делаем кнопку "Проверить ответ" неактивной
+            submitBtn.disabled = true;
+            
+            // Через 3 секунды закрываем вопрос
+            setTimeout(() => {
+                closeQuestion();
+                updateActiveTeam();
+                submitBtn.disabled = false;
+            }, 3000);
+        }
+
+        // Обновление отображения счета
+        function updateScoreDisplay() {
+            team1Score.textContent = gameState.team1Score;
+            team2Score.textContent = gameState.team2Score;
+        }
+
+        // Обновление активной команды
+        function updateActiveTeam() {
+            if (gameState.currentTeam === 1) {
+                team1Element.classList.add('active');
+                team2Element.classList.remove('active');
+            } else {
+                team1Element.classList.remove('active');
+                team2Element.classList.add('active');
+            }
+        }
+
+        // Проверка завершения игры
+        function checkGameFinished() {
+            if (gameState.usedQuestions.length >= 25 && !gameState.gameFinished) {
+                gameState.gameFinished = true;
+                
+                let winnerText = "";
+                if (gameState.team1Score > gameState.team2Score) {
+                    winnerText = `🎊 Победила ${gameState.team1Name}! 🎊`;
+                    winnerMessage.className = "winner-message team-1-winner";
+                } else if (gameState.team2Score > gameState.team1Score) {
+                    winnerText = `🎊 Победила ${gameState.team2Name}! 🎊`;
+                    winnerMessage.className = "winner-message team-2-winner";
+                } else {
+                    winnerText = "🤝 Ничья! Обе команды молодцы! 🤝";
+                    winnerMessage.className = "winner-message draw";
+                }
+                
+                winnerMessage.innerHTML = `
+                    <div>${winnerText}</div>
+                    <div>🔵 ${gameState.team1Name}: ${gameState.team1Score} очков</div>
+                    <div>🔴 ${gameState.team2Name}: ${gameState.team2Score} очков</div>
+                `;
+                winnerMessage.style.display = 'block';
+            }
+        }
+
+        // Сохранение состояния игры
+        function saveGameState() {
+            localStorage.setItem('teaQuizKidsState', JSON.stringify(gameState));
+        }
+
+        // Загрузка состояния игры
+        function loadGameState() {
+            const savedState = localStorage.getItem('teaQuizKidsState');
+            if (savedState) {
+                const loadedState = JSON.parse(savedState);
+                
+                // Проверяем, была ли игра начата
+                if (loadedState.gameStarted) {
+                    gameState = {...gameState, ...loadedState};
+                } else {
+                    // Если игра не была начата, используем начальное состояние
+                    gameState = {...initialGameState};
+                }
+                
+                // Обновляем поля ввода названий команд
+                team1NameInput.value = gameState.team1Name;
+                team2NameInput.value = gameState.team2Name;
+            }
+        }
+
+        // Сброс игры
+        function resetGame() {
+            if (confirm('Начать новую игру? Текущий прогресс будет потерян.')) {
+                gameState = {...initialGameState};
+                
+                // Сбрасываем поля ввода
+                team1NameInput.value = "Команда 1";
+                team2NameInput.value = "Команда 2";
+                
+                updateScoreDisplay();
+                updateActiveTeam();
+                saveGameState();
+                renderGameBoard();
+                winnerMessage.style.display = 'none';
+                
+                if (questionScreen.style.display === 'flex') {
+                    closeQuestion();
+                }
+            }
+        }
+
+        // Запуск игры при загрузке страницы
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+
+</body></html>
